@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from dateutil.parser import parse
@@ -208,3 +209,6 @@ class Purchase:
             return f"{cost} {currency}"
 
         return None
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)

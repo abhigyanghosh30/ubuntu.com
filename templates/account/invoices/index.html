@@ -27,6 +27,7 @@
   <div class="row">
     <div class="col-12">
       {% if invoices %}
+        <p class="u-hide" id="invoices">{{invoices}}</p>
         <table class="p-table--mobile-card">
           <thead>
             <th>Service</th>
@@ -35,51 +36,18 @@
             <th class="u-align--right" style="padding-right: 5%">Total</th>
             <th>Download PDF</th>
           </thead>
-          <tbody>
-            {% for invoice in invoices %}
-              <tr>
-                <td aria-label="Service">
-                  {% if invoice.marketplace == "canonical-ua"%}
-                    Canonical UA
-                  {% elif invoice.marketplace == "blender" %}
-                    Blender Support
-                  {% elif invoice.marketplace == "canonical-cube" %}
-                    Canonical CUBE 
-                  {% endif %}{% if invoice.period %} ({{ invoice.period }}){% endif %}</td>
-                <td aria-label="Date">{{ invoice.get_formatted_date() }}</td>
-                <td aria-label="Status">
-                  {% if invoice.invoice %}
-                    {% if invoice.invoice.status == "paid" %}
-                      <div class="p-label--new">Paid</div>
-                    {% elif invoice.invoice.status == "open" %}
-                      <div class="p-label--deprecated">Failed</div>
-                    {% else %}
-                      <div class="p-label">Pending</div>
-                    {% endif %}
-                  {% else %}
-                    <div class="p-label">Pending</div>
-                  {% endif %}
-                </td>
-                <td class="u-align--right" aria-label="Total" style="padding-right: 5%">
-                  {% if invoice.invoice %}
-                    <span class="js-format-price">
-                      {{ invoice.get_total() }}
-                    </span>
-                  {% else %}
-                    -
-                  {% endif %}
-                </td>
-                <td aria-label="Download PDF">
-                  {% if invoice.invoice %}
-                    <a href="invoices/download/{{ invoice.id }}" target="_blank">Download</a>
-                  {% else %}
-                    No invoice available
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
+          <tbody id="invoice__table">
           </tbody>
         </table>
+        <nav class="p-pagination" aria-label="Pagination">
+          <ol class="p-pagination__items">
+            {% for i in range((total_payments//rows_per_page)+1) %}
+            <li class="p-pagination__item">
+              <a class="p-pagination__link" onclick="updateTable({{i+1}})">{{i+1}}</a>
+            </li>
+            {% endfor %}
+          </ol>
+        </nav>
       {% else %}
         <p>No invoices available.</p>
       {% endif %}
@@ -89,6 +57,17 @@
 
 
 <script>
+  var payments = JSON.parse(document.getElementById("invoices").innerText);
+  console.log(payments);
+  function updateTable(pageNumber){
+    let startIndex = (pageNumber-1)*{{rows_per_page}};
+    let endIndex = startIndex+{{rows_per_page}};
+    for(let index=startIndex;index<endIndex;index++)
+    {
+      let row = document.createElement("tr");
+      
+    }
+  }
   const prices = document.querySelectorAll('.js-format-price');
   prices.forEach(price => {
     const amount = price.innerText.split(' ')[0];
@@ -109,6 +88,8 @@
     href.searchParams.set('marketplace', value);
     window.location.replace(href);
   })
+
+
 </script>
 
 {% endblock content %}
