@@ -440,7 +440,7 @@ def cred_scheduled(
     **kwargs,
 ):
     ability_screen_id = 4190
-    response = trueability_api.get_assessment_reservations(ability_screen_id)
+    #  response = trueability_api.get_assessment_reservations(ability_screen_id)
 
     #  exams = []
     #  user_email = user_info(flask.session)["email"]
