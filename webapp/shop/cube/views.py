@@ -409,20 +409,22 @@ def cred_schedule(
         starts_at = datetime.strptime(date_and_time, "%Y-%m-%dT%H:%M")
         timezone = data["timezone"]
         print(starts_at)
-        response = trueability_api.post_assessment_reservation(
-            ability_screen_id,
-            starts_at.isoformat(),
-            email,
-            first_name,
-            last_name,
-            timezone,
-        )
-        print(json.dumps(response, indent=4))
+        #  response = trueability_api.post_assessment_reservation(
+        #      ability_screen_id,
+        #      starts_at.isoformat(),
+        #      email,
+        #      first_name,
+        #      last_name,
+        #      timezone,
+        #  )
+        #  print(json.dumps(response, indent=4))
+        #
+        #  if "error" in response:
+        #      error = response["message"]
+        #  else:
+        #      return flask.redirect("/credentialing/scheduled")
 
-        if "error" in response:
-            error = response["message"]
-        else:
-            return flask.redirect("/credentialing/scheduled")
+        return flask.redirect("/credentialing/scheduled")
 
     return flask.render_template("credentialing/schedule.html", error=error)
 
@@ -440,24 +442,48 @@ def cred_scheduled(
     ability_screen_id = 4190
     response = trueability_api.get_assessment_reservations(ability_screen_id)
 
-    exams = []
-    user_email = user_info(flask.session)["email"]
-    for r in response["assessment_reservations"]:
-        if r["user"]["email"] != user_email:
-            continue
+    #  exams = []
+    #  user_email = user_info(flask.session)["email"]
+    #  for r in response["assessment_reservations"]:
+    #      if r["user"]["email"] != user_email:
+    #          continue
+    #
+    #      name = r["ability_screen"]["display_name"]
+    #      starts_at = datetime.strptime(r["starts_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+    #      timezone = r["user"]["time_zone"]
+    #      exams.append(
+    #          {
+    #              "name": name,
+    #              "date": starts_at.strftime("%d %b %Y"),
+    #              "time": starts_at.strftime("%H:%M"),
+    #              "timezone": timezone,
+    #              "state": r["state"],
+    #          }
+    #      )
 
-        name = r["ability_screen"]["display_name"]
-        starts_at = datetime.strptime(r["starts_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        timezone = r["user"]["time_zone"]
-        exams.append(
-            {
-                "name": name,
-                "date": starts_at.strftime("%d %b %Y"),
-                "time": starts_at.strftime("%H:%M"),
-                "timezone": timezone,
-                "state": r["state"],
-            }
-        )
+    exams = [
+        {
+            "name": "Linux Essentials [Sandbox]",
+            "date": "29 Aug 2022",
+            "time": "19:00",
+            "timezone": "Europe/Berlin",
+            "state": "scheduled",
+        },
+        {
+            "name": "Linux Essentials [Sandbox]",
+            "date": "25 Aug 2022",
+            "time": "15:30",
+            "timezone": "Europe/Berlin",
+            "state": "cancelled",
+        },
+        {
+            "name": "Linux Essentials [Sandbox]",
+            "date": "20 Aug 2022",
+            "time": "13:30",
+            "timezone": "America/Chicago",
+            "state": "processed",
+        },
+    ]
 
     return flask.render_template("credentialing/scheduled.html", exams=exams)
 
