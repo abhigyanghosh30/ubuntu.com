@@ -413,17 +413,18 @@ def cred_schedule(
     min_date = (now + timedelta(days=1)).strftime("%Y-%m-%d")
     max_date = (now + timedelta(days=7)).strftime("%Y-%m-%d")
 
+    sso_user = user_info(flask.session)
+    ability_screen_id = 4190
+    email = sso_user["email"]
+
     if flask.request.method == "POST":
         data = flask.request.form
-        sso_user = user_info(flask.session)
         timezone = data["timezone"]
         tz_info = pytz.timezone(timezone)
         scheduled_time = f"{data['date']}T{data['time']}"
         starts_at = tz_info.localize(
             datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
         )
-        ability_screen_id = 4190
-        email = sso_user["email"]
         first_name, last_name = sso_user["fullname"].rsplit(" ", maxsplit=1)
         response = None
 
@@ -432,6 +433,18 @@ def cred_schedule(
                 starts_at.isoformat(), timezone, data["uuid"]
             )
         else:
+            user_exams = trueability_api.get_user_assessment_reservations(
+                ability_screen_id, email
+            )
+            user_exams = [
+                exam for exam in user_exams if exam["state"] != "canceled"
+            ]
+            if len(user_exams) > 0:
+                return flask.render_template(
+                    "/credentials/schedule.html",
+                    error="You have already scheduled an exam",
+                )
+
             response = trueability_api.post_assessment_reservation(
                 ability_screen_id,
                 starts_at.isoformat(),
@@ -476,6 +489,18 @@ def cred_schedule(
         )
         date = starts_at.strftime("%Y-%m-%d")
         time = starts_at.strftime("%H:%M")
+    else:
+        user_exams = trueability_api.get_user_assessment_reservations(
+            ability_screen_id, email
+        )
+        user_exams = [
+            exam for exam in user_exams if exam["state"] != "canceled"
+        ]
+        if len(user_exams) > 0:
+            return flask.render_template(
+                "/credentials/schedule.html",
+                error="You have already scheduled an exam",
+            )
 
     return flask.render_template(
         "credentials/schedule.html",
