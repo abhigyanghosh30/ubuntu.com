@@ -321,7 +321,11 @@ app.add_url_rule(
     "/advantage/contracts/<contract_id>/token", view_func=get_contract_token
 )
 app.add_url_rule("/advantage/users", view_func=advantage_account_users_view)
-app.add_url_rule("/advantage/magic-attach", view_func=activate_magic_attach,methods=["POST"])
+app.add_url_rule(
+    "/advantage/magic-attach",
+    view_func=activate_magic_attach,
+    methods=["POST"],
+)
 app.add_url_rule("/advantage/account-users", view_func=get_account_users)
 app.add_url_rule(
     "/advantage/accounts/<account_id>/user",

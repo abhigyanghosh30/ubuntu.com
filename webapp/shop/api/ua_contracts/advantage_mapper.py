@@ -1,5 +1,4 @@
 from typing import List, Dict, Optional, Union
-from urllib import response
 
 from webapp.shop.api.ua_contracts.api import UAContractsAPI
 from webapp.shop.api.ua_contracts.models import (
@@ -35,7 +34,6 @@ from webapp.shop.api.ua_contracts.schema import (
     InvoiceSchema,
     EnsurePurchaseAccountSchema,
 )
-from webapp.shop.schemas import MagicAttachTokenSchema
 
 
 class AdvantageMapper:
@@ -340,7 +338,8 @@ class AdvantageMapper:
         )
 
         return PurchaseSchema().load(purchase)
-    
-    def activate_magic_attach(self, userCode:str, contractID:str):
-        return self.ua_contracts_api.post_magic_attach(request_body={"userCode":userCode,"contractID":contractID})
-        
+
+    def activate_magic_attach(self, userCode: str, contractID: str):
+        return self.ua_contracts_api.post_magic_attach(
+            request_body={"userCode": userCode, "contractID": contractID}
+        )
