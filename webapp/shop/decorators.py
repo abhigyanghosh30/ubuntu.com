@@ -7,12 +7,11 @@ import pytz
 
 import flask
 import talisker.requests
+from webapp.shop.api.skillable.api import SkillableAPI
 
 from webapp.shop.api.ua_contracts.api import UAContractsAPI
 from webapp.shop.api.ua_contracts.advantage_mapper import AdvantageMapper
-from webapp.shop.api.badgr.api import BadgrAPI
 from webapp.shop.api.credly.api import CredlyAPI
-from webapp.shop.api.trueability.api import TrueAbilityAPI
 from webapp.login import user_info
 from requests import Session
 
@@ -69,9 +68,8 @@ def shop_decorator(area=None, permission=None, response="json", redirect=None):
     area = area if area in AREA_LIST else "account"
 
     session = talisker.requests.get_session()
-    badgr_session = init_badgr_session(area)
-    trueability_session = init_trueability_session(area)
     credly_session = init_credly_session(area)
+    skillable_session = init_skillable_session(area)
 
     def decorator(func):
         @wraps(func)
@@ -135,10 +133,7 @@ def shop_decorator(area=None, permission=None, response="json", redirect=None):
                 ),
                 ua_contracts_api=ua_contracts_api,
                 advantage_mapper=advantage_mapper,
-                badgr_api=get_badgr_api_instance(area, badgr_session),
-                trueability_api=get_trueability_api_instance(
-                    area, trueability_session
-                ),
+                skillable_api=get_skillable_api_instance(area, skillable_session),
                 credly_api=get_credly_api_instance(area, credly_session),
                 is_in_maintenance=is_in_maintenance,
                 is_community_member=is_community_member,
@@ -169,16 +164,6 @@ def canonical_staff():
     return decorator
 
 
-def init_badgr_session(area) -> Session:
-    if area != "cred":
-        return None
-
-    badgr_session = Session()
-    talisker.requests.configure(badgr_session)
-
-    return badgr_session
-
-
 def init_credly_session(area) -> Session:
     if area != "cred":
         return None
@@ -188,16 +173,14 @@ def init_credly_session(area) -> Session:
 
     return credly_session
 
-
-def init_trueability_session(area) -> Session:
+def init_skillable_session(area) -> Session:
     if area != "cred":
         return None
 
-    trueability_session = Session()
-    talisker.requests.configure(trueability_session)
+    skillable_session = Session()
+    talisker.requests.configure(skillable_session)
 
-    return trueability_session
-
+    return skillable_session
 
 def get_redirect_default(area) -> str:
     redirect_path = "/account"
@@ -207,19 +190,6 @@ def get_redirect_default(area) -> str:
         redirect_path = "/credentials"
 
     return redirect_path
-
-
-def get_badgr_api_instance(area, badgr_session) -> BadgrAPI:
-    if area != "cred":
-        return None
-
-    return BadgrAPI(
-        os.getenv("BADGR_URL", "https://api.eu.badgr.io"),
-        os.getenv("BAGDR_USER"),
-        os.getenv("BADGR_PASSWORD"),
-        badgr_session,
-    )
-
 
 def get_credly_api_instance(area, credly_session) -> CredlyAPI:
     if area != "cred":
@@ -234,17 +204,15 @@ def get_credly_api_instance(area, credly_session) -> CredlyAPI:
         session=credly_session,
     )
 
-
-def get_trueability_api_instance(area, trueability_session) -> TrueAbilityAPI:
+def get_skillable_api_instance(area, skillable_session) -> SkillableAPI:
     if area != "cred":
         return None
 
-    return TrueAbilityAPI(
-        os.getenv("TRUEABILITY_URL", "https://app.trueability.com"),
-        os.getenv("TRUEABILITY_API_KEY", ""),
-        trueability_session,
+    return SkillableAPI(
+        os.getenv("SKILLABLE_URL", "https://labondemand.com/api/v3"),
+        os.getenv("SKILLABLE_API_KEY", ""),
+        skillable_session,
     )
-
 
 def get_ua_contracts_api_instance(
     user_token, response, session

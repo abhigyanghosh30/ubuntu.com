@@ -95,38 +95,14 @@ env:
   - name: SENTRY_DSN
     value: https://0293bb7fc3104e56bafd2422e155790c@sentry.is.canonical.com//13
 
-  - name: BADGR_URL
-    value: https://api.eu.badgr.io
-
-  - name: BAGDR_USER
-    secretKeyRef:
-      key: user
-      name: badgr
-
-  - name: BADGR_PASSWORD
-    secretKeyRef:
-      key: password
-      name: badgr
-
-  - name: BADGR_ISSUER
-    value: eTedPNzMTuqy1SMWJ05UbA
-
-  - name: CERTIFIED_BADGE
-    value: hs8gVorCRgyO2mNUfeXaLw
-
   - name: CONTRACTS_API_URL
     value: https://contracts.canonical.com/
 
   - name: STRIPE_PUBLISHABLE_KEY
     value: pk_live_68aXqowUeX574aGsVck8eiIE
 
-  - name: TRUEABILITY_URL
-    value: https://app.trueability.com
-
-  - name: TRUEABILITY_API_KEY
-    secretKeyRef:
-      key: api-key
-      name: trueability
+  - name: SKILLABLE_URL
+    value: https://labondemand.com/api/v3
 
 memoryLimit: 512Mi
 
@@ -253,13 +229,13 @@ production:
             key: password
             name: confidentiality-webhook
 
-        - name: TRUEABILITY_URL
-          value: https://app.trueability.com
+        - name: SKILLABLE_URL
+          value: https://labondemand.com/api/v3
 
-        - name: TRUEABILITY_API_KEY
+        - name: SKILLABLE_API_KEY
           secretKeyRef:
             key: api-key
-            name: trueability
+            name: skillable
 
     - paths: [/tutorials]
       name: ubuntu-com-tutorials
@@ -567,24 +543,6 @@ staging:
     - name: SENTRY_DSN
       value: https://0293bb7fc3104e56bafd2422e155790c@sentry.is.canonical.com//13
 
-    - name: BADGR_URL
-      value: https://api.test.badgr.com
-
-    - name: BAGDR_USER
-      secretKeyRef:
-        key: user
-        name: badgr
-
-    - name: BADGR_PASSWORD
-      secretKeyRef:
-        key: qa-password
-        name: badgr
-
-    - name: BADGR_ISSUER
-      value: 36ZEJnXdTjqobw93BJElog
-
-    - name: CERTIFIED_BADGE
-      value: x9kzmcNhSSyqYhZcQGz0qg
 
     - name: CONTRACTS_API_URL
       value: https://contracts.staging.canonical.com/
@@ -592,18 +550,13 @@ staging:
     - name: STRIPE_PUBLISHABLE_KEY
       value: pk_test_yndN9H0GcJffPe0W58Nm64cM00riYG4N46
 
-    - name: TRUEABILITY_URL
-      value: https://app.trueability.com
+    - name: SKILLABLE_URL
+      value: https://labondemand.com/api/v3
 
-    - name: TRUEABILITY_API_KEY
+    - name: SKILLABLE_API_KEY
       secretKeyRef:
         key: api-key
-        name: trueability
-
-    - name: TA_WEBHOOK_API_KEY
-      secretKeyRef:
-        key: webhook-secret
-        name: trueability
+        name: skillable
 
     - name: CREDLY_URL
       value: https://api.credly.com/v1
@@ -662,24 +615,6 @@ staging:
         - name: SENTRY_DSN
           value: https://0293bb7fc3104e56bafd2422e155790c@sentry.is.canonical.com//13
 
-        - name: BADGR_URL
-          value: https://api.test.badgr.com
-
-        - name: BAGDR_USER
-          secretKeyRef:
-            key: user
-            name: badgr
-
-        - name: BADGR_PASSWORD
-          secretKeyRef:
-            key: qa-password
-            name: badgr
-
-        - name: BADGR_ISSUER
-          value: 36ZEJnXdTjqobw93BJElog
-
-        - name: CERTIFIED_BADGE
-          value: x9kzmcNhSSyqYhZcQGz0qg
 
         - name: CONTRACTS_API_URL
           value: https://contracts.staging.canonical.com/
@@ -727,19 +662,14 @@ staging:
           secretKeyRef:
             key: password
             name: confidentiality-webhook
+        
+        - name: SKILLABLE_URL
+          value: https://labondemand.com/api/v3
 
-        - name: TRUEABILITY_URL
-          value: https://app.trueability.com
-
-        - name: TRUEABILITY_API_KEY
+        - name: SKILLABLE_API_KEY
           secretKeyRef:
             key: api-key
-            name: trueability
-
-        - name: TA_WEBHOOK_API_KEY
-          secretKeyRef:
-            key: webhook-secret
-            name: trueability
+            name: skillable
 
         - name: CREDLY_URL
           value: https://api.credly.com/v1
@@ -992,38 +922,19 @@ demo:
     - name: SENTRY_DSN
       value: https://0293bb7fc3104e56bafd2422e155790c@sentry.is.canonical.com//13
 
-    - name: BADGR_URL
-      value: https://api.test.badgr.com
-
-    - name: BAGDR_USER
-      secretKeyRef:
-        key: user
-        name: badgr
-
-    - name: BADGR_PASSWORD
-      secretKeyRef:
-        key: qa-password
-        name: badgr
-
-    - name: BADGR_ISSUER
-      value: 36ZEJnXdTjqobw93BJElog
-
-    - name: CERTIFIED_BADGE
-      value: x9kzmcNhSSyqYhZcQGz0qg
-
     - name: CONTRACTS_API_URL
       value: https://contracts.staging.canonical.com/
 
     - name: STRIPE_PUBLISHABLE_KEY
       value: pk_test_yndN9H0GcJffPe0W58Nm64cM00riYG4N46
+    
+    - name: SKILLABLE_URL
+      value: https://labondemand.com/api/v3
 
-    - name: TRUEABILITY_URL
-      value: https://app.trueability.com
-
-    - name: TRUEABILITY_API_KEY
+    - name: SKILLABLE_API_KEY
       secretKeyRef:
         key: api-key
-        name: trueability
+        name: skillable
 
     - name: CANONICAL_LOGIN_URL
       value: https://login.ubuntu.com/
