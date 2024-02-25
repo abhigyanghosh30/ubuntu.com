@@ -195,13 +195,8 @@ def cred_your_exams(ua_contracts_api, trueability_api, **kwargs):
             }
         )
         exam_contracts = []
-    exams_in_progress = []
-    exams_scheduled = []
-    exams_not_taken = []
-    exams_complete = []
-    exams_cancelled = []
-    exams_expired = []
-
+    
+    exams = []
     if exam_contracts:
         for exam_contract in exam_contracts:
             name = exam_contract["cueContext"]["courseID"]
@@ -209,132 +204,6 @@ def cred_your_exams(ua_contracts_api, trueability_api, **kwargs):
             contract_item_id = (
                 exam_contract.get("id") or exam_contract["contractItem"]["id"]
             )
-
-            if (
-                "effectivenessContext" in exam_contract
-                and "status" in exam_contract["effectivenessContext"]
-                and exam_contract["effectivenessContext"]["status"]
-                == "expired"
-            ):
-                exams_expired.append(
-                    {"name": name, "state": "Expired", "actions": []}
-                )
-                continue
-
-            if "reservation" in exam_contract["cueContext"]:
-                response = trueability_api.get_assessment_reservation(
-                    exam_contract["cueContext"]["reservation"]["IDs"][-1]
-                )
-                r = response["assessment_reservation"]
-
-                timezone = r["user"]["time_zone"]
-                tz_info = pytz.timezone(timezone)
-                starts_at = (
-                    datetime.strptime(r["starts_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                    .replace(tzinfo=pytz.timezone("UTC"))
-                    .astimezone(tz_info)
-                )
-                assessment_id = r.get("assessment") and r["assessment"]["id"]
-
-                actions = []
-                utc = pytz.timezone("UTC")
-                now = utc.localize(datetime.utcnow())
-                end = starts_at + timedelta(minutes=75)
-                state = RESERVATION_STATES.get(r["state"], r["state"])
-
-                if assessment_id and now > starts_at and now < end:
-                    actions.extend(
-                        [
-                            {
-                                "text": "Take exam",
-                                "href": "/credentials/exam?"
-                                f"id={ assessment_id }",
-                                "button_class": "p-button--positive",
-                            }
-                        ]
-                    )
-
-                    exams_in_progress.append(
-                        {
-                            "name": name,
-                            "date": starts_at.strftime("%d %b %Y"),
-                            "time": starts_at.strftime("%I:%M %p %Z"),
-                            "timezone": timezone,
-                            "state": "In progress",
-                            "uuid": r["uuid"],
-                            "actions": actions,
-                        }
-                    )
-
-                elif state == "Scheduled":
-                    actions.extend(
-                        [
-                            {
-                                "text": "Reschedule",
-                                "href": "/credentials/schedule?"
-                                f"contractItemID={contract_item_id}"
-                                f"&uuid={r['uuid']}",
-                                "button_class": "p-button",
-                            },
-                        ]
-                    )
-
-                    exams_scheduled.append(
-                        {
-                            "name": name,
-                            "date": starts_at.strftime("%d %b %Y"),
-                            "time": starts_at.strftime("%I:%M %p %Z"),
-                            "timezone": timezone,
-                            "state": state,
-                            "uuid": r["uuid"],
-                            "actions": actions,
-                        }
-                    )
-                elif state == "Complete":
-                    exams_complete.append(
-                        {
-                            "name": name,
-                            "date": starts_at.strftime("%d %b %Y"),
-                            "time": starts_at.strftime("%I:%M %p %Z"),
-                            "timezone": timezone,
-                            "state": state,
-                            "uuid": r["uuid"],
-                            "actions": actions,
-                        }
-                    )
-                elif state == "Cancelled":
-                    exams_cancelled.append(
-                        {
-                            "name": name,
-                            "date": starts_at.strftime("%d %b %Y"),
-                            "time": starts_at.strftime("%I:%M %p %Z"),
-                            "timezone": timezone,
-                            "state": state,
-                            "uuid": r["uuid"],
-                            "actions": actions,
-                        }
-                    )
-            else:
-                actions = [
-                    {
-                        "text": "Schedule",
-                        "href": "/credentials/schedule?"
-                        f"contractItemID={contract_item_id}",
-                        "button_class": "p-button",
-                    },
-                ]
-                exams_not_taken.append(
-                    {"name": name, "state": "Not taken", "actions": actions}
-                )
-
-    exams = (
-        exams_in_progress
-        + exams_scheduled
-        + exams_not_taken
-        + exams_complete
-        + exams_cancelled
-        + exams_expired
-    )
 
     response = flask.make_response(
         flask.render_template(
