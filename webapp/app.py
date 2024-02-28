@@ -65,27 +65,28 @@ from webapp.shop.advantage.views import (
 from webapp.shop.cred.views import (
     activate_activation_key,
     confidentiality_agreement_webhook,
-    cred_assessments,
+    # cred_assessments,
     cred_beta_activation,
     cred_cancel_exam,
-    cred_exam,
+    # cred_exam,
     cred_home,
     cred_redeem_code,
-    cred_schedule,
+    # cred_schedule,
     cred_self_study,
     cred_shop,
     cred_shop_thank_you,
     cred_sign_up,
     cred_submit_form,
     cred_syllabus_data,
+    cred_take_exam,
     cred_your_exams,
     get_activation_keys,
     get_cue_products,
-    get_filtered_webhook_responses,
+    # get_filtered_webhook_responses,
     get_issued_badges,
     get_my_issued_badges,
-    get_webhook_response,
-    issue_badges,
+    # get_webhook_response,
+    # issue_badges,
     rotate_activation_key,
 )
 from webapp.shop.views import (
@@ -860,15 +861,16 @@ app.add_url_rule("/credentials", view_func=cred_home)
 app.add_url_rule("/credentials/self-study", view_func=cred_self_study)
 app.add_url_rule("/credentials/syllabus", view_func=cred_syllabus_data)
 app.add_url_rule("/credentials/sign-up", view_func=cred_sign_up)
-app.add_url_rule(
-    "/credentials/schedule",
-    view_func=cred_schedule,
-    methods=["GET", "POST"],
-)
+# app.add_url_rule(
+#     "/credentials/schedule",
+#     view_func=cred_schedule,
+#     methods=["GET", "POST"],
+# )
 app.add_url_rule("/credentials/your-exams", view_func=cred_your_exams)
 app.add_url_rule("/credentials/cancel-exam", view_func=cred_cancel_exam)
-app.add_url_rule("/credentials/assessments", view_func=cred_assessments)
-app.add_url_rule("/credentials/exam", view_func=cred_exam)
+# app.add_url_rule("/credentials/assessments", view_func=cred_assessments)
+# app.add_url_rule("/credentials/exam", view_func=cred_exam)
+app.add_url_rule("/credentials/take-exam", view_func=cred_take_exam)
 app.add_url_rule(
     "/credentials/<string:type>/products",
     view_func=get_cue_products,
@@ -912,21 +914,21 @@ app.add_url_rule(
     view_func=cred_beta_activation,
     methods=["GET", "POST"],
 )
-app.add_url_rule(
-    "/credentials/get_filtered_webhook_responses",
-    view_func=get_filtered_webhook_responses,
-    methods=["GET"],
-)
-app.add_url_rule(
-    "/credentials/get_webhook_response",
-    view_func=get_webhook_response,
-    methods=["GET"],
-)
-app.add_url_rule(
-    "/credentials/assessment_passed",
-    view_func=issue_badges,
-    methods=["POST"],
-)
+# app.add_url_rule(
+#     "/credentials/get_filtered_webhook_responses",
+#     view_func=get_filtered_webhook_responses,
+#     methods=["GET"],
+# )
+# app.add_url_rule(
+#     "/credentials/get_webhook_response",
+#     view_func=get_webhook_response,
+#     methods=["GET"],
+# )
+# app.add_url_rule(
+#     "/credentials/assessment_passed",
+#     view_func=issue_badges,
+#     methods=["POST"],
+# )
 
 app.add_url_rule(
     "/credentials/get_issued_badges",

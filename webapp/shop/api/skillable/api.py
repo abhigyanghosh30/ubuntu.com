@@ -54,10 +54,10 @@ class SkillableAPI:
         path = f"/launch"
         return self.make_request(
             "POST", path, params={"userid": userid, "labid": labid}, **kwargs
-        )
+        ).json()
 
     def get_all_user_exams(self, userid: str, **kwargs):
         path = f"/userrunningandsavedlabs"
         return self.make_request(
             "GET", path, params={"userid": userid}, **kwargs
-        )
+        ).json()
