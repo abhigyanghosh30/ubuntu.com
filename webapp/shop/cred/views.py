@@ -358,7 +358,7 @@ def cred_take_exam(ua_contracts_api, skillable_api, **_):
     lab_id = EXAM_IDS[exam_name]
     response = skillable_api.launch_lab(userid=user_id, labid=lab_id)
     url = response["Url"]
-    return flask.redirect(url) 
+    return flask.render_template("credentials/exam.html",url=url) 
 
 
 @shop_decorator(area="cred", permission="user", response="html")
