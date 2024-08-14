@@ -148,9 +148,7 @@ def cred_sign_up(**_):
         "userAgentString": flask.request.headers.get("User-Agent"),
     }
     referrer = flask.request.referrer
-    client_ip = flask.request.headers.get(
-        "X-Real-IP", flask.request.remote_addr
-    )
+    client_ip = flask.request.headers.get("X-Real-IP", flask.request.remote_addr)
 
     if client_ip and ":" not in client_ip:
         visitor_data["leadClientIpAddress"] = client_ip
@@ -264,8 +262,7 @@ def cred_schedule(
         country_code = TIMEZONE_COUNTRIES[timezone]
         assessment_reservation_uuid = None
         template_data = {
-            key: data[key]
-            for key in ["date", "time", "timezone", "contract_item_id"]
+            key: data[key] for key in ["date", "time", "timezone", "contract_item_id"]
         }
         template_data["min_date"] = min_date
         template_data["max_date"] = max_date
@@ -278,8 +275,7 @@ def cred_schedule(
             hours=6 if is_staging else 1
         ):
             error = (
-                f"Start time should be at least {time_delay}"
-                + " from now or later."
+                f"Start time should be at least {time_delay}" + " from now or later."
             )
             return flask.render_template(
                 "/credentials/schedule.html",
@@ -315,9 +311,7 @@ def cred_schedule(
             if not contract_long_id:
                 return flask.redirect("/credentials/your-exams")
             contract_detail = ua_contracts_api.get_contract(contract_long_id)
-            effective_from = now.astimezone(tz_info) + timedelta(
-                hours=time_delta
-            )
+            effective_from = now.astimezone(tz_info) + timedelta(hours=time_delta)
             effective_to = (
                 datetime.strptime(
                     f"{contract_detail['contractInfo']['effectiveTo']}",
@@ -471,11 +465,8 @@ def cred_your_exams(
     confidentiality_agreement_enabled = strtobool(
         os.getenv("CREDENTIALS_CONFIDENTIALITY_ENABLED", "false")
     )
-    if (
-        confidentiality_agreement_enabled
-        and not has_filed_confidentiality_agreement(
-            flask.session["openid"]["email"].lower()
-        )
+    if confidentiality_agreement_enabled and not has_filed_confidentiality_agreement(
+        flask.session["openid"]["email"].lower()
     ):
         agreement_notification = True
 
@@ -532,24 +523,18 @@ def cred_your_exams(
                     timezone = r["user"]["time_zone"]
                     tz_info = pytz.timezone(timezone)
                     starts_at = (
-                        datetime.strptime(
-                            r["starts_at"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                        )
+                        datetime.strptime(r["starts_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
                         .replace(tzinfo=pytz.timezone("UTC"))
                         .astimezone(tz_info)
                     )
-                    assessment_id = (
-                        r.get("assessment") and r["assessment"]["id"]
-                    )
+                    assessment_id = r.get("assessment") and r["assessment"]["id"]
 
                 actions = []
                 utc = pytz.timezone("UTC")
                 now = utc.localize(datetime.utcnow())
                 end = starts_at + timedelta(minutes=75)
                 if assessment_id:
-                    state = RESERVATION_STATES.get(
-                        r["assessment"]["state"], r["state"]
-                    )
+                    state = RESERVATION_STATES.get(r["assessment"]["state"], r["state"])
                 else:
                     state = RESERVATION_STATES.get(r["state"], r["state"])
 
@@ -565,8 +550,7 @@ def cred_your_exams(
                 # if assessment is provisioned
                 if assessment_id:
                     is_in_window = (now > starts_at and now < end) or (
-                        now < starts_at
-                        and now > starts_at - timedelta(minutes=30)
+                        now < starts_at and now > starts_at - timedelta(minutes=30)
                     )
                     provisioned_but_not_taken = is_in_window and state in [
                         RESERVATION_STATES["notified"],
@@ -582,12 +566,10 @@ def cred_your_exams(
                                 {
                                     "text": (
                                         "Continue exam"
-                                        if state
-                                        == RESERVATION_STATES["in_progress"]
+                                        if state == RESERVATION_STATES["in_progress"]
                                         else "Take exam"
                                     ),
-                                    "href": "/credentials/exam?"
-                                    f"id={assessment_id}",
+                                    "href": "/credentials/exam?" f"id={assessment_id}",
                                     "button_class": "p-button--positive",
                                 }
                             ]
@@ -599,9 +581,7 @@ def cred_your_exams(
                         "time": starts_at.strftime("%I:%M %p %Z"),
                         "timezone": timezone,
                         "state": (
-                            "Ready to be taken"
-                            if provisioned_but_not_taken
-                            else state
+                            "Ready to be taken" if provisioned_but_not_taken else state
                         ),
                         "uuid": r["uuid"],
                         "actions": actions,
@@ -647,12 +627,9 @@ def cred_your_exams(
             elif (
                 "effectivenessContext" in exam_contract
                 and "status" in exam_contract["effectivenessContext"]
-                and exam_contract["effectivenessContext"]["status"]
-                == "expired"
+                and exam_contract["effectivenessContext"]["status"] == "expired"
             ):
-                exams_expired.append(
-                    {"name": name, "state": "Expired", "actions": []}
-                )
+                exams_expired.append({"name": name, "state": "Expired", "actions": []})
             # if exam is not used and is not expired
             else:
                 actions = [
@@ -729,12 +706,8 @@ def cred_assessments(trueability_api, **_):
         exams.append(
             {
                 "name": name,
-                "date": (
-                    started_at.strftime("%d %b %Y") if started_at else "N/A"
-                ),
-                "time": (
-                    started_at.strftime("%I:%M %p %Z") if started_at else "N/A"
-                ),
+                "date": (started_at.strftime("%d %b %Y") if started_at else "N/A"),
+                "time": (started_at.strftime("%I:%M %p %Z") if started_at else "N/A"),
                 "timezone": timezone,
                 "state": r["state"],
                 "id": r["id"],
@@ -754,9 +727,8 @@ def cred_exam(trueability_api, **_):
         os.getenv("CREDENTIALS_CONFIDENTIALITY_ENABLED", "false")
     )
 
-    if (
-        confidentiality_agreement_enabled
-        and not has_filed_confidentiality_agreement(email)
+    if confidentiality_agreement_enabled and not has_filed_confidentiality_agreement(
+        email
     ):
         return flask.render_template("credentials/exam-no-agreement.html"), 403
 
@@ -846,9 +818,7 @@ def cred_submit_form(**_):
     form_fields["ExitSurveyPromoterManager"] = int(
         form_fields["ExitSurveyPromoterManager"]
     )
-    form_fields["ExitSurveyPromoterPeer"] = int(
-        form_fields["ExitSurveyPromoterPeer"]
-    )
+    form_fields["ExitSurveyPromoterPeer"] = int(form_fields["ExitSurveyPromoterPeer"])
     # Check honeypot values are not set
     honeypots = {}
     honeypots["name"] = flask.request.form.get("name")
@@ -908,9 +878,7 @@ def cred_shop(ua_contracts_api, advantage_mapper, **kwargs):
     ua_contracts_api.ensure_purchase_account("canonical-cube")
     account = advantage_mapper.get_purchase_account("canonical-cube")
     if (account.hasChannelStoreAccess) is True:
-        return flask.render_template(
-            "account/forbidden.html", reason="channel_account"
-        )
+        return flask.render_template("account/forbidden.html", reason="channel_account")
 
     exams_file = open("webapp/shop/cred/exams.json", "r")
     exams = json.load(exams_file)
@@ -1044,9 +1012,7 @@ def cred_redeem_code(ua_contracts_api, advantage_mapper, **kwargs):
         )
         contract_id = get_exam_contract_id(exam_contracts[-1])
         if action == "schedule":
-            return flask.redirect(
-                f"/credentials/schedule?contractItemID={contract_id}"
-            )
+            return flask.redirect(f"/credentials/schedule?contractItemID={contract_id}")
         return flask.render_template(
             "/credentials/redeem.html",
             notification_class="positive",
@@ -1093,7 +1059,20 @@ def get_activation_keys(ua_contracts_api, advantage_mapper, **kwargs):
     keys = []
     for contract in contracts:
         contract_id = contract.id
-        keys.extend(ua_contracts_api.list_activation_keys(contract_id))
+        try:
+            contract_keys = ua_contracts_api.list_activation_keys(contract_id)
+            if contract_keys:
+                keys.extend(contract_keys)
+        except Exception as error:
+            flask.current_app.extensions["sentry"].captureException(
+                extra={
+                    "request_url": error.request.url,
+                    "request_headers": error.request.headers,
+                    "response_headers": error.response.headers,
+                    "response_body": error.response.json(),
+                }
+            )
+            continue
 
     return flask.jsonify(keys)
 
@@ -1214,9 +1193,7 @@ def issue_credly_badge(credly_api, **kwargs):
 @shop_decorator(area="cred", permission="user", response="html")
 def get_my_issued_badges(credly_api, **kwargs):
     sso_user_email = user_info(flask.session)["email"]
-    response = credly_api.get_issued_badges(
-        filter={"recipient_email": sso_user_email}
-    )
+    response = credly_api.get_issued_badges(filter={"recipient_email": sso_user_email})
     return flask.render_template(
         "credentials/your-badges.html", badges=response["data"]
     )
@@ -1229,17 +1206,15 @@ def issue_badges(trueability_api, credly_api, **kwargs):
     if not api_key or api_key != os.getenv("TA_WEBHOOK_API_KEY"):
         return flask.jsonify({"status": "Invalid API Key"}), 401
     assessment_score = webhook_response["assessment"]["score"]
-    cutoff_score = webhook_response["assessment"]["ability_screen"][
-        "cutoff_score"
-    ]
+    cutoff_score = webhook_response["assessment"]["ability_screen"]["cutoff_score"]
     if assessment_score >= cutoff_score:
         assessment_user = webhook_response["assessment"]["user"]["email"]
         first_name, last_name = webhook_response["assessment"]["user"][
             "full_name"
         ].rsplit(" ", 1)
-        ability_screen_id = webhook_response["assessment"][
-            "ability_screen_variant"
-        ]["ability_screen_id"]
+        ability_screen_id = webhook_response["assessment"]["ability_screen_variant"][
+            "ability_screen_id"
+        ]
         new_badge = credly_api.issue_new_badge(
             email=assessment_user,
             first_name=first_name,
@@ -1253,9 +1228,7 @@ def issue_badges(trueability_api, credly_api, **kwargs):
                 flask.jsonify(
                     {
                         "status": "badge_issued",
-                        "accept_badge_url": new_badge["data"][
-                            "accept_badge_url"
-                        ],
+                        "accept_badge_url": new_badge["data"]["accept_badge_url"],
                     }
                 ),
                 201,
@@ -1282,8 +1255,7 @@ def get_cue_products(ua_contracts_api, type, **kwargs):
             "price": listing.get("price", {"currency": "USD", "value": "0"}),
         }
         for listing in listings
-        if (listing["productID"].endswith("key") and type == "keys")
-        or (type == "exam")
+        if (listing["productID"].endswith("key") and type == "keys") or (type == "exam")
     ]
     return flask.jsonify(filtered_products)
 
@@ -1291,9 +1263,7 @@ def get_cue_products(ua_contracts_api, type, **kwargs):
 @shop_decorator(area="cred", permission="user", response="html")
 @credentials_group()
 def cred_dashboard(trueability_api, **_):
-    first_reservations = trueability_api.get_assessment_reservations(
-        per_page=10
-    )
+    first_reservations = trueability_api.get_assessment_reservations(per_page=10)
     last_page = first_reservations["meta"]["total_pages"]
     latest_reservations = trueability_api.get_assessment_reservations(
         page=last_page, per_page=10
@@ -1309,9 +1279,7 @@ def cred_dashboard(trueability_api, **_):
 def cred_dashboard_upcoming_exams(trueability_api, **_):
     per_page = 50
     page = int(flask.request.args.get("page", 1)) - 1
-    first_reservations = trueability_api.get_assessment_reservations(
-        per_page=per_page
-    )
+    first_reservations = trueability_api.get_assessment_reservations(per_page=per_page)
     last_page = first_reservations["meta"]["total_pages"]
     latest_reservations = trueability_api.get_assessment_reservations(
         page=last_page - page, per_page=per_page
